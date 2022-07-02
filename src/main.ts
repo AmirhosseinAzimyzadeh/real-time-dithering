@@ -29,16 +29,22 @@ function init() {
   };
 
 
+  let stream: MediaStream | null = null;
   navigator.mediaDevices.getUserMedia( {audio: false, video: true })
-  .then((stream) => {
-    video.srcObject = stream;
+  .then((s) => {
+    stream = s;
+    video.srcObject = s;
   })
   .catch(error => console.error(error));
 
-  const draw = () => {
+  const draw = async () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    if (stream) {
+      const frameData = ctx.createImageData(canvas.width, canvas.height);
+      console.log(frameData.data.length)      
+    }
     requestAnimationFrame(draw);
   }
   window.requestAnimationFrame(draw);
