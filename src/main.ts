@@ -12,6 +12,11 @@ app.innerHTML = `
   <button>Capture</button>
 `
 
+function getColorIndicesForCoord(x: number, y: number, width: number) {
+  const red = y * (width * 4) + x * 4;
+  return [red, red + 1, red + 2, red + 3];
+}
+
 function init() {
   const video = document.querySelector('video');
   const canvas = document.querySelector('canvas');
@@ -42,8 +47,19 @@ function init() {
     if (!ctx) return;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     if (stream) {
-      const frameData = ctx.createImageData(canvas.width, canvas.height);
-      console.log(frameData.data.length)      
+      const frameData = ctx.getImageData(0,0,100,100);
+      
+      const xCoord = 20;
+      const yCoord = 20;
+      const canvasWidth = canvas.width;
+      const colorIndices = getColorIndicesForCoord(xCoord, yCoord, canvasWidth);
+      const [redIndex, greenIndex, blueIndex, alphaIndex] = colorIndices;
+      console.log({
+        r: frameData.data[redIndex],
+        g: frameData.data[greenIndex],
+        b: frameData.data[blueIndex],
+        a: frameData.data[alphaIndex],
+      })
     }
     requestAnimationFrame(draw);
   }
