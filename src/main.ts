@@ -54,16 +54,30 @@ function init() {
       const canvasWidth = canvas.width;
       const colorIndices = getColorIndicesForCoord(xCoord, yCoord, canvasWidth);
       const [redIndex, greenIndex, blueIndex, alphaIndex] = colorIndices;
-      console.log({
-        r: frameData.data[redIndex],
-        g: frameData.data[greenIndex],
-        b: frameData.data[blueIndex],
-        a: frameData.data[alphaIndex],
-      })
+
+
+      for (let row = 0; row < canvas.height; row++) {
+        for (let column = 0; column < canvas.width; column++) {
+          const colorIndices = getColorIndicesForCoord(column, row, canvas.width);
+          const [redIndex, greenIndex, blueIndex, alphaIndex] = colorIndices;
+          const [r, g, b, a] = [frameData.data[redIndex], frameData.data[greenIndex], frameData.data[blueIndex], frameData.data[alphaIndex]];
+          const avg = (r + g + b) / 3;
+          const [newR, newG, newB] = [
+            avg,
+            avg,
+            avg,
+          ];
+          frameData.data[redIndex] = newR;
+          frameData.data[greenIndex] = newG;
+          frameData.data[blueIndex] = newB;
+          frameData.data[alphaIndex] = a;
+        }
+      }
+      ctx.putImageData(frameData, 0, 0);
     }
 
-    
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // ctx.fillRect(0, 0, canvas.width, canvas.height);
     requestAnimationFrame(draw);
   }
   window.requestAnimationFrame(draw);
