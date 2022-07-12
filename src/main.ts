@@ -71,7 +71,8 @@ function init() {
           const error = avg - currentColor;
 
           // neighbor pixels
-          const factor = 1/16;
+          const factor = 1/256;
+          const correctionValue = Math.round(error * factor);
 
 
           frameData.data[redIndex] = currentColor;
@@ -82,7 +83,6 @@ function init() {
           // bottom right
           if (column === canvas.width - 1 && row === canvas.height - 1) {
             // next pixel
-
             continue;
             // top left
           } else if (column === 0 && row === 0) {
@@ -97,6 +97,45 @@ function init() {
 
             continue;
           }
+
+
+          const colorIndices1 = getColorIndicesForCoord(column + 1, row, canvas.width);
+          const [redIndex1, greenIndex1, blueIndex1, alphaIndex1] = colorIndices1;
+          const [r1, g1, b1] = getColorValues(column + 1, row, canvas.width, frameData);
+          const b1Color = ((r1 + g1 + b1) / 3) + correctionValue;
+          frameData.data[redIndex1] = b1Color;
+          frameData.data[greenIndex1] = b1Color;
+          frameData.data[blueIndex1] = b1Color;
+          frameData.data[alphaIndex1] = 255;
+
+
+          const colorIndices2 = getColorIndicesForCoord(column + 1, row + 1, canvas.width);
+          const [redIndex2, greenIndex2, blueIndex2, alphaIndex2] = colorIndices2;
+          const [r2, g2, b2] = getColorValues(column + 1, row + 1, canvas.width, frameData);
+          const b2Color = ((r2 + g2 + b2) / 3) + correctionValue;
+          frameData.data[redIndex2] = b2Color;
+          frameData.data[greenIndex2] = b2Color;
+          frameData.data[blueIndex2] = b2Color;
+          frameData.data[alphaIndex2] = 255;
+
+
+          const colorIndices3 = getColorIndicesForCoord(column, row + 1, canvas.width);
+          const [redIndex3, greenIndex3, blueIndex3, alphaIndex3] = colorIndices3;
+          const [r3, g3, b3] = getColorValues(column, row + 1, canvas.width, frameData);
+          const b3Color = ((r3 + g3 + b3) / 3) + correctionValue;
+          frameData.data[redIndex3] = b3Color;
+          frameData.data[greenIndex3] = b3Color;
+          frameData.data[blueIndex3] = b3Color;
+          frameData.data[alphaIndex3] = 255;
+
+          const colorIndices4 = getColorIndicesForCoord(column - 1, row + 1, canvas.width);
+          const [redIndex4, greenIndex4, blueIndex4, alphaIndex4] = colorIndices4;
+          const [r4, g4, b4] = getColorValues(column, row + 1, canvas.width, frameData);
+          const b4Color = ((r4 + g4 + b4) / 3) + correctionValue;
+          frameData.data[redIndex4] = b4Color;
+          frameData.data[greenIndex4] = b4Color;
+          frameData.data[blueIndex4] = b4Color;
+          frameData.data[alphaIndex4] = 255;
         }
       }
       ctx.putImageData(frameData, 0, 0);
