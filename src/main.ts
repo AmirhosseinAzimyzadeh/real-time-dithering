@@ -8,9 +8,13 @@ app.innerHTML = `
   </div>
   <div>
     <canvas></canvas>
+
+    <input type="range" id="volume" name="volume"
+    min="1" max="255" step="1" value="255">
   </div>
-  <button>Capture</button>
 `
+
+let FACTOR = 255;
 
 function getColorIndicesForCoord(x: number, y: number, width: number) {
   const red = y * (width * 4) + x * 4;
@@ -31,18 +35,14 @@ function getColorValues(x: number, y: number, width: number, frameData: ImageDat
 function init() {
   const video = document.querySelector('video');
   const canvas = document.querySelector('canvas');
-  const button = document.querySelector('button');
-  if (!video || !canvas || !button) return;
+  const input = document.querySelector('input') as HTMLInputElement;
+  if (!video || !canvas || !input) return;
   canvas.width = 480;
   canvas.height = 360;
 
-  button.onclick = function() {
-    /* set the canvas to the dimensions of the video feed */
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    /* make the snapshot */
-    canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height);
-  };
+  input.addEventListener('change', (e) => {
+    FACTOR = Number(e.target?.value);
+  })
 
 
   let stream: MediaStream | null = null;
@@ -71,7 +71,7 @@ function init() {
           const error = avg - currentColor;
 
           // neighbor pixels
-          const factor = 1/256;
+          const factor = 1/FACTOR;
           const correctionValue = Math.round(error * factor);
 
 
