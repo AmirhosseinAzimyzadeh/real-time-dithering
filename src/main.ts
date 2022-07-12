@@ -1,3 +1,4 @@
+// TODO: this code needs to be refactored to be more readable
 import './style.css'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
