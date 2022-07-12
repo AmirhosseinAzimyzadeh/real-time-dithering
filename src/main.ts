@@ -17,6 +17,17 @@ function getColorIndicesForCoord(x: number, y: number, width: number) {
   return [red, red + 1, red + 2, red + 3];
 }
 
+function getColorValues(x: number, y: number, width: number, frameData: ImageData) {
+  const colorIndices = getColorIndicesForCoord(x, y, width);
+  const [redIndex, greenIndex, blueIndex, alphaIndex] = colorIndices;
+  return [
+    frameData.data[redIndex],
+    frameData.data[greenIndex],
+    frameData.data[blueIndex],
+    frameData.data[alphaIndex]
+  ];
+}
+
 function init() {
   const video = document.querySelector('video');
   const canvas = document.querySelector('canvas');
@@ -48,23 +59,44 @@ function init() {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     if (stream) {
       const frameData = ctx.getImageData(0,0,canvas.width, canvas.height);
-      
+
       for (let row = 0; row < canvas.height; row++) {
         for (let column = 0; column < canvas.width; column++) {
           const colorIndices = getColorIndicesForCoord(column, row, canvas.width);
           const [redIndex, greenIndex, blueIndex, alphaIndex] = colorIndices;
-          const [r, g, b, a] = [frameData.data[redIndex], frameData.data[greenIndex], frameData.data[blueIndex], frameData.data[alphaIndex]];
+          const [r, g, b, a] = getColorValues(column, row, canvas.width, frameData);
+          
           let avg = (r + g + b) / 3;
-          avg = avg > 255/2 ? 255 : 0;
-          const [newR, newG, newB] = [
-            avg,
-            avg,
-            avg,
-          ];
-          frameData.data[redIndex] = newR;
-          frameData.data[greenIndex] = newG;
-          frameData.data[blueIndex] = newB;
-          frameData.data[alphaIndex] = a;
+          const currentColor = avg < 128 ? 0 : 255;
+          const error = avg - currentColor;
+
+          // neighbor pixels
+          const factor = 1/16;
+
+
+          frameData.data[redIndex] = currentColor;
+          frameData.data[greenIndex] = currentColor;
+          frameData.data[blueIndex] = currentColor;
+          frameData.data[alphaIndex] = 255;
+
+          // bottom right
+          if (column === canvas.width - 1 && row === canvas.height - 1) {
+            // next pixel
+
+            continue;
+            // top left
+          } else if (column === 0 && row === 0) {
+
+            continue;
+            // top right
+          } else if (column === canvas.width - 1 && row === 0) {
+
+            continue;
+            // bottom left
+          } else if (column === 0 && row === canvas.height - 1) {
+
+            continue;
+          }
         }
       }
       ctx.putImageData(frameData, 0, 0);
