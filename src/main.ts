@@ -47,7 +47,7 @@ function init() {
     if (!ctx) return;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     if (stream) {
-      const frameData = ctx.getImageData(0,0,100,100);
+      const frameData = ctx.getImageData(0,0,canvas.width, canvas.height);
       
       const xCoord = 20;
       const yCoord = 20;
@@ -61,6 +61,9 @@ function init() {
         a: frameData.data[alphaIndex],
       })
     }
+
+    
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     requestAnimationFrame(draw);
   }
   window.requestAnimationFrame(draw);
